@@ -3,8 +3,9 @@ from datetime import datetime as dt
 from aiogoogle import Aiogoogle
 
 from app.core.config import settings
+from app.services.constants import FORMAT, RANGE, VERSION
 
-FORMAT = "%Y/%m/%d %H:%M:%S"
+
 SHEETS_BODY = {
     'properties': {'title': '', 'locale': 'ru_RU'},
     'sheets': [{'properties': {'sheetType': 'GRID',
@@ -18,7 +19,7 @@ SHEETS_BODY = {
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     """Функция создания документа с таблицами."""
     SHEETS_BODY['properties']['title'] = 'Отчет на {}'.format(dt.now().strftime(FORMAT))
-    service = await wrapper_services.discover('sheets', 'v4')
+    service = await wrapper_services.discover('sheets', VERSION)
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=SHEETS_BODY))
     return response['spreadsheetId']
@@ -60,6 +61,6 @@ async def spreadsheets_update_value(spreadsheet_id: str,
     await wrapper_services.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
-            range='A1:C30',
+            range=RANGE,
             valueInputOption='USER_ENTERED',
             json=update_body))
